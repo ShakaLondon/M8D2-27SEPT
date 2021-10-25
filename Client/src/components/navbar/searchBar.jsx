@@ -62,7 +62,7 @@ get renderBlogs() {
   render() {
     
     return (
-      <div>
+      <div className="w-100">
         <InputGroup className=" d-inline-flex pt-3 w-100 search-bar-nav" className={`containersearch${this.props.showSearch ? "show" : ""}`}>
     <FormControl
       type="text" placeholder="Search blogs, authors and categories..." className="search-bar-nav mr-sm-2" value={this.props.searchInput} onChange={this.onChangeHandler}

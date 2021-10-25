@@ -91,7 +91,7 @@ class BlogPage extends Component {
       return (
         <div className="blog-details-root">
           <Container>
-            <Image className="blog-details-cover" src={this.state.blog.cover} fluid />
+            <Image className="blog-details-cover h-100" src={this.state.blog.cover} fluid />
             <h1 className="blog-details-title">{this.state.blog.title}</h1>
 
             <div className="blog-details-container">

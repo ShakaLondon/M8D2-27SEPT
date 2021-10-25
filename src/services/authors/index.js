@@ -4,11 +4,13 @@ import q2m from "query-to-mongo"
 
 import AuthorModel from "./schema.js"
 import BlogModel from "../blogs/blog-schema.js"
+import { basicAuthMiddleware } from "../../auth/basic.js"
+import { adminOnly } from "../../auth/adminonly.js"
 // import addAuthor from "./insert.js"
 
 const authorRouter = express.Router()
 
-authorRouter.post("/", async (req, res, next) => {
+authorRouter.post("/register", async (req, res, next) => {
   try {
 
     const newAuthor = new AuthorModel(req.body)
@@ -31,12 +33,14 @@ authorRouter.post("/", async (req, res, next) => {
   }
 })
 
-authorRouter.get("/", async (req, res, next) => {
+authorRouter.get("/", basicAuthMiddleware, adminOnly, async (req, res, next) => {
   try {
 
-    const authors = await AuthorModel.find()
+    const authorsList = await AuthorModel.find()
 
-    res.send(authors)
+    console.log(authorsList, "listOfAuthors")
+
+    res.send(authorsList)
 
   } catch (error) {
 
@@ -45,7 +49,46 @@ authorRouter.get("/", async (req, res, next) => {
   }
 })
 
-authorRouter.get("/:authorId", async (req, res, next) => {
+// login
+authorRouter.post("/me", basicAuthMiddleware, async (req, res, next) => {
+  try {
+    console.log(req.user, "HERE 5")
+    res.send(req.user)
+  } catch (error) {
+    next(createError(500, "An error occurred while getting author"))
+  }
+})
+
+authorRouter.get("/me/blogs", basicAuthMiddleware, async (req, res, next) => {
+  try {
+
+    const authorId = req.user._id
+
+    console.log(authorId)
+
+    // const authorSearch = String(authorId)
+
+    // console.log(authorSearch)
+
+    const blogsByAuthor = await BlogModel.find({ author: { $in: authorId }}, 
+    function(err, result) {
+      if (err) {
+        res.send(err);
+      }
+      })
+
+    if (blogsByAuthor) {
+      console.log(blogsByAuthor)
+      res.send(blogsByAuthor)
+    } else {
+      next(createError(404, `Author with _id ${authorId} not found!`))
+    }
+  } catch (error) {
+    next(createError(500, "An error occurred while getting author"))
+  }
+})
+
+authorRouter.get("/:authorId", basicAuthMiddleware, adminOnly, async (req, res, next) => {
   try {
 
     const authorId = req.params.authorId
@@ -62,7 +105,7 @@ authorRouter.get("/:authorId", async (req, res, next) => {
   }
 })
 
-authorRouter.delete("/:authorId", async (req, res, next) => {
+authorRouter.delete("/:authorId", basicAuthMiddleware, adminOnly, async (req, res, next) => {
   try {
     const authorId = req.params.authorId
 
@@ -78,7 +121,7 @@ authorRouter.delete("/:authorId", async (req, res, next) => {
   }
 })
 
-authorRouter.put("/:authorId", async (req, res, next) => {
+authorRouter.put("/:authorId", basicAuthMiddleware, adminOnly, async (req, res, next) => {
   try {
     const authorId = req.params.authorId
 
@@ -97,7 +140,7 @@ authorRouter.put("/:authorId", async (req, res, next) => {
   }
 })
 
-authorRouter.get("/:authorId/blogs/", async (req, res, next) => {
+authorRouter.get("/:authorId/blogs/", basicAuthMiddleware, adminOnly, async (req, res, next) => {
   try {
 
     const authorId = req.params.authorId

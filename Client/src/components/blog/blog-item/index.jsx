@@ -16,12 +16,12 @@ export default class BlogItem extends Component {
 
 
   render() {
-    const { title, category, cover, author, id, content, } = this.props;
+    const { title, category, cover, author, _id, content, } = this.props;
 
     console.log({...this.props.author})
 
     return (
-      <Link to={`/blogs/${id}`} className="blog-link">
+      <Link to={`/blogs/${_id}`} className="blog-link">
         <Card className="blog-card">
           <Card.Img variant="top" src={this.props.cover} className="blog-cover" />
           <Card.Body>

@@ -13,7 +13,7 @@ import listEndpoints from "express-list-endpoints";
 // BASIC SERVER CREATION
 // REMEMBER TO UPDATE START SCRIPT IN PACKAGE JSON
 
-import authorsRouter from "./services/authors/index.js";
+import authorRouter from "./services/authors/index.js";
 import blogsRouter from "./services/blogs/blog-index.js";
 import filesRouter from "./services/uploads/index.js"
 import { getCurrentFolderPath } from "./lib/fs-tools.js"
@@ -28,6 +28,8 @@ import {
   catchAllErrorHandler,
   entryForbiddenMiddleware,
   notFoundMiddleware,
+  forbbidenHandler,
+  unauthorisedHandler,
 } from "./errorHandlers.js";
 
 const publicFolderPath = join(getCurrentFolderPath(import.meta.url), "../public")
@@ -55,7 +57,7 @@ server.use(express.json());
 server.use(bodyParser.urlencoded({ extended: false }))
 server.use(bodyParser.json())
 
-server.use("/authors", authorsRouter);
+server.use("/authors", authorRouter);
 server.use("/blogs", blogsRouter);
 server.use("/blogs", filesRouter);
 // server.use("/authors/:id/blogs", authorByBlogs),
@@ -65,6 +67,8 @@ server.use("/blogs", filesRouter);
 server.use(notFoundMiddleware);
 server.use(entryForbiddenMiddleware);
 server.use(catchAllErrorHandler);
+server.use(unauthorisedHandler);
+server.use(forbbidenHandler);
 
 // MIDDLEWARES
 
